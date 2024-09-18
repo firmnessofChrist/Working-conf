@@ -155,12 +155,56 @@ if __name__ == "__main__":
     else:
         print("Дубликаты не найдены.")
         Мы создали 2 файла: 12.txt и 22.txt имеющие следующие строки: "12345" и "123456"
-        ![image](https://github.com/user-attachments/assets/10d67179-18b7-4895-8759-e491652933b1)
 
+
+
+![image](https://github.com/user-attachments/assets/211e3b6c-ffe8-43e7-b06b-c6d25cc988d9)
 ## Задача 8
+![image](https://github.com/user-attachments/assets/ed4fe389-b4a2-4a82-ae6a-1b33b6070c93)
+
+![image](https://github.com/user-attachments/assets/bb3fe2bd-5122-4dc4-bf8e-5a5b7080aa8d)
 
 Написать программу, которая находит все файлы в данном каталоге с расширением, указанным в качестве аргумента и архивирует все эти файлы в архив tar.
+import os
+import tarfile
+import argparse
 
+def find_files_with_extension(directory, extension):
+    """Находит все файлы с заданным расширением в указанном каталоге."""
+    matched_files = []
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith(extension):
+                matched_files.append(os.path.join(root, file))
+    return matched_files
+
+def create_tar_archive(files, archive_name):
+    """Создает архив tar из списка файлов."""
+    with tarfile.open(archive_name, 'w') as tar:
+        for file in files:
+            tar.add(file, arcname=os.path.relpath(file, start=os.path.dirname(files[0])))
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Архивирует файлы с заданным расширением.")
+    parser.add_argument("directory", help="Путь к каталогу для поиска файлов.")
+    parser.add_argument("extension", help="Расширение файлов для архивации (например, .txt).")
+    parser.add_argument("archive_name", help="Имя выходного архива (например, archive.tar).")
+    
+    args = parser.parse_args()
+
+    files_to_archive = find_files_with_extension(args.directory, args.extension)
+
+    if files_to_archive:
+        create_tar_archive(files_to_archive, args.archive_name)
+        print(f"Архив '{args.archive_name}' успешно создан с {len(files_to_archive)} файлами.")
+    else:
+        print("Файлы с указанным расширением не найдены.")
+
+
+
+
+
+        
 ## Задача 9
 
 Написать программу, которая заменяет в файле последовательности из 4 пробелов на символ табуляции. Входной и выходной файлы задаются аргументами.
