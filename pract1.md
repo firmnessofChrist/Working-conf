@@ -57,11 +57,15 @@ h hello include int main n printf return stdio void world
 Написать программу для регистрации пользовательской команды (правильные права доступа и копирование в /usr/local/bin).
 
 Например, пусть программа называется reg:
+#!/usr/bin/env python3
 
-```
-./reg banner
-```
+import sys
 
+def main():
+    print("Команда успешно зарегистрирована!")
+
+if __name__ == "__main__":
+    main()
 В результате для banner задаются правильные права доступа и сам banner копируется в /usr/local/bin.
 ![image](https://github.com/user-attachments/assets/5d940109-bdcb-407d-9a9a-cc4c0ae31f8f)
 
