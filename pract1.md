@@ -8,6 +8,8 @@
 
 Вывести отсортированный в алфавитном порядке список имен пользователей в файле passwd (вам понадобится grep).
 
+![image](https://github.com/user-attachments/assets/054a5bb2-f983-48c8-a165-094e736d185a)
+
 ## Задача 2
 
 Вывести данные /etc/protocols в отформатированном и отсортированном порядке для 5 наибольших портов, как показано в примере ниже:
@@ -21,6 +23,8 @@
 138 manet
 ```
 
+![image](https://github.com/user-attachments/assets/9f852690-75a9-4c61-a7aa-dcbaf78248a3)
+
 ## Задача 3
 
 Написать программу banner средствами bash для вывода текстов, как в следующем примере (размер баннера должен меняться!):
@@ -31,6 +35,8 @@
 | Hello from RTU MIREA! |
 +-----------------------+
 ```
+
+![image](https://github.com/user-attachments/assets/b8f93929-9945-4413-816b-97b1cb320396)
 
 Перед отправкой решения проверьте его в ShellCheck на предупреждения.
 
@@ -44,6 +50,8 @@
 h hello include int main n printf return stdio void world
 ```
 
+![image](https://github.com/user-attachments/assets/e888d4dd-ebad-4c01-bd08-f3ffdd905378)
+
 ## Задача 5
 
 Написать программу для регистрации пользовательской команды (правильные права доступа и копирование в /usr/local/bin).
@@ -55,10 +63,45 @@ h hello include int main n printf return stdio void world
 ```
 
 В результате для banner задаются правильные права доступа и сам banner копируется в /usr/local/bin.
+![image](https://github.com/user-attachments/assets/5d940109-bdcb-407d-9a9a-cc4c0ae31f8f)
 
 ## Задача 6
 
 Написать программу для проверки наличия комментария в первой строке файлов с расширением c, js и py.
+
+import os
+
+def check_comment(file_path):
+    with open(file_path, 'r') as file:
+        first_line = file.readline().strip()
+        
+        if file_path.endswith('.c'):
+            if first_line.startswith('//') or first_line.startswith('/*'):
+                return f"{file_path}: комментарий найден"
+            else:
+                return f"{file_path}: комментарий не найден"
+        
+        elif file_path.endswith('.js'):
+            if first_line.startswith('//'):
+                return f"{file_path}: комментарий найден"
+            else:
+                return f"{file_path}: комментарий не найден"
+        
+        elif file_path.endswith('.py'):
+            if first_line.startswith('#'):
+                return f"{file_path}: комментарий найден"
+            else:
+                return f"{file_path}: комментарий не найден"
+        
+        else:
+            return f"{file_path}: неподдерживаемый формат"
+
+# Перебираем все файлы с заданными расширениями в текущем каталоге
+for filename in os.listdir('.'):
+    if filename.endswith(('.c', '.js', '.py')):
+        result = check_comment(filename)
+        print(result)
+        
 
 ## Задача 7
 
