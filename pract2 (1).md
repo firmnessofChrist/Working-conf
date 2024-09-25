@@ -57,7 +57,39 @@ if __name__ == "__main__":
 
 ## Задача 2
 
-Вывести служебную информацию о пакете express (JavaScript). Разобрать основные элементы содержимого файла со служебной информацией из пакета. Как получить пакет без менеджера пакетов, прямо из репозитория?
+создание новой директории проекта: 
+mkdir express_info
+cd express_info
+
+инициализируем пакет: 
+
+
+![image](https://github.com/user-attachments/assets/4d4f116d-ae47-4b5d-a253-ac4f20cf1c03)
+
+
+устанавливаем: npm install express
+
+создание файла: nano express_info.js
+
+код крипта:
+
+const express = require('express');
+
+// Получаем информацию о пакете express
+const packageInfo = require('./node_modules/express/package.json');
+
+console.log(`Имя пакета: ${packageInfo.name}`);
+console.log(`Версия: ${packageInfo.version}`);
+console.log(`Описание: ${packageInfo.description}`);
+console.log(`Главный файл: ${packageInfo.main}`);
+console.log(`Лицензия: ${packageInfo.license}`);
+console.log(`Авторы: ${packageInfo.author}`);
+console.log(`Зависимости: ${JSON.stringify(packageInfo.dependencies, null, 2)}`);
+
+запуск скрипта: node express_info.js
+
+
+![image](https://github.com/user-attachments/assets/aa07db6c-0e96-4ae1-bd8e-f4ef15846269)
 
 ## Задача 3
 
