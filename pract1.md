@@ -74,131 +74,194 @@ if __name__ == "__main__":
 Написать программу для проверки наличия комментария в первой строке файлов с расширением c, js и py.
 
 import os
+import sys
 
-def check_comment(file_path):
-    with open(file_path, 'r') as file:
-        first_line = file.readline().strip()
-        
-        if file_path.endswith('.c'):
-            if first_line.startswith('//') or first_line.startswith('/*'):
-                return f"{file_path}: комментарий найден"
-            else:
-                return f"{file_path}: комментарий не найден"
-        
-        elif file_path.endswith('.js'):
-            if first_line.startswith('//'):
-                return f"{file_path}: комментарий найден"
-            else:
-                return f"{file_path}: комментарий не найден"
-        
-        elif file_path.endswith('.py'):
-            if first_line.startswith('#'):
-                return f"{file_path}: комментарий найден"
-            else:
-                return f"{file_path}: комментарий не найден"
-        
-        else:
-            return f"{file_path}: неподдерживаемый формат"
+# Функция для проверки наличия комментария в первой строке файла
+def check_first_line_for_comment(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            first_line = file.readline().strip()
 
-# Перебираем все файлы с заданными расширениями в текущем каталоге
-for filename in os.listdir('.'):
-    if filename.endswith(('.c', '.js', '.py')):
-        result = check_comment(filename)
-        print(result)
-        
-![image](https://github.com/user-attachments/assets/d5b8865c-c6bd-46bf-beac-f7d66d75b4b1)
+            # Проверяем на наличие комментария для каждого типа файлов
+            if file_path.endswith('.c') or file_path.endswith('.js'):
+                # Комментарии в стиле C/JS (// или /*)
+                if first_line.startswith('//') or first_line.startswith('/*'):
+                    return True
+            elif file_path.endswith('.py'):
+                # Комментарии в стиле Python (#)
+                if first_line.startswith('#'):
+                    return True
+        return False
+    except Exception as e:
+        print(f"Ошибка при чтении файла {file_path}: {e}")
+        return False
+
+# Функция для поиска файлов в директории и проверки их на наличие комментария в первой строке
+def check_files_in_directory(directory):
+    try:
+        if not os.path.isdir(directory):
+            print(f"Ошибка: {directory} не является директорией.")
+            return
+
+        # Проходим по всем файлам в директории
+        for filename in os.listdir(directory):
+            filepath = os.path.join(directory, filename)
+
+            # Проверяем файлы с расширениями .c, .js и .py
+            if os.path.isfile(filepath) and (filename.endswith('.c') or filename.endswith('.js') or filename.endswith('.py')):
+                if check_first_line_for_comment(filepath):
+                    print(f"Файл {filename} содержит комментарий в первой строке.")
+                else:
+                    print(f"Файл {filename} НЕ содержит комментарий в первой строке.")
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Использование: python3 script.py <директория>")
+    else:
+        directory = sys.argv[1]
+        check_files_in_directory(directory)
+
+
+создаем файлы и проверяем комментарии в каждом из них
+
+![image](https://github.com/user-attachments/assets/eddc313d-7d47-4b92-b08b-799965498cf6)
 
 ## Задача 7
 
 Написать программу для нахождения файлов-дубликатов (имеющих 1 или более копий содержимого) по заданному пути (и подкаталогам).
+Как работает программа:
+Хеширование файлов: Программа вычисляет MD5-хеш для каждого файла, прочитывая его поблочно, чтобы избежать проблем с большими файлами.
+Сравнение файлов: Все файлы, которые имеют одинаковый хеш, считаются дубликатами.
+Рекурсивный обход каталогов: Программа использует os.walk(), чтобы рекурсивно обойти все файлы в указанной директории и её подкаталогах.
+код программы:
+
 import os
 import hashlib
-from collections import defaultdict
 
-def hash_file(file_path):
-    """Возвращает хеш файла."""
-    hasher = hashlib.md5()  # Используем MD5 для хеширования
+# Функция для вычисления хеша файла
+def get_file_hash(file_path):
+    hasher = hashlib.md5()  # Используем MD5 для вычисления хеша файла
     try:
-        with open(file_path, 'rb') as f:
-            while chunk := f.read(8192):
+        with open(file_path, 'rb') as file:
+            while chunk := file.read(8192):  # Читаем файл порциями по 8KB
                 hasher.update(chunk)
-        return hasher.hexdigest()
     except Exception as e:
-        print(f"Ошибка при открытии файла {file_path}: {e}")
+        print(f"Ошибка при чтении файла {file_path}: {e}")
         return None
+    return hasher.hexdigest()
 
-def find_duplicates(directory):
-    """Находит дубликаты файлов в заданном каталоге."""
-    file_hashes = defaultdict(list)
+# Функция для поиска файлов-дубликатов
+def find_duplicate_files(directory):
+    if not os.path.isdir(directory):
+        print(f"Ошибка: {directory} не является директорией.")
+        return
 
+    # Словарь для хранения хеша и списка файлов с одинаковым содержимым
+    file_hashes = {}
+
+    # Проходим по всем файлам и подкаталогам
     for root, _, files in os.walk(directory):
-        for file in files:
-            file_path = os.path.join(root, file)
-            file_hash = hash_file(file_path)
-            if file_hash:
-                file_hashes[file_hash].append(file_path)
+        for filename in files:
+            filepath = os.path.join(root, filename)
 
-    # Выводим дубликаты
-    duplicates = {hash_value: paths for hash_value, paths in file_hashes.items() if len(paths) > 1}
-    return duplicates
+            # Вычисляем хеш содержимого файла
+            file_hash = get_file_hash(filepath)
+
+            if file_hash:
+                # Если такой хеш уже есть, добавляем файл в список дубликатов
+                if file_hash in file_hashes:
+                    file_hashes[file_hash].append(filepath)
+                else:
+                    file_hashes[file_hash] = [filepath]
+
+    # Выводим найденные дубликаты
+    duplicates_found = False
+    for file_list in file_hashes.values():
+        if len(file_list) > 1:
+            duplicates_found = True
+            print("Найдены дубликаты:")
+            for file in file_list:
+                print(file)
+            print()  # Пустая строка для разделения групп дубликатов
+
+    if not duplicates_found:
+        print("Дубликаты не найдены.")
 
 if __name__ == "__main__":
-    path_to_search = input("Введите путь для поиска дубликатов: ")
-    duplicates = find_duplicates(path_to_search)
-
-    if duplicates:
-        print("Найденные дубликаты:")
-        for hash_value, paths in duplicates.items():
-            print(f"\nХеш: {hash_value}")
-            for path in paths:
-                print(f"  {path}")
+    if len(os.sys.argv) != 2:
+        print("Использование: python3 find_duplicates.py <директория>")
     else:
-        print("Дубликаты не найдены.")
-        Мы создали 2 файла: 12.txt и 22.txt имеющие следующие строки: "12345" и "123456"
+        directory = os.sys.argv[1]
+        find_duplicate_files(directory)
+создаем директорию и файлы
+
+программа успешно справилась с поиском дубликатов:
+
+![image](https://github.com/user-attachments/assets/fa5e868a-eac8-4ed9-870b-fe4dd50da8ef)
 
 
 
-![image](https://github.com/user-attachments/assets/211e3b6c-ffe8-43e7-b06b-c6d25cc988d9)
 ## Задача 8
-![image](https://github.com/user-attachments/assets/ed4fe389-b4a2-4a82-ae6a-1b33b6070c93)
-
-![image](https://github.com/user-attachments/assets/bb3fe2bd-5122-4dc4-bf8e-5a5b7080aa8d)
 
 Написать программу, которая находит все файлы в данном каталоге с расширением, указанным в качестве аргумента и архивирует все эти файлы в архив tar.
+
+код программы:
+
 import os
+import sys
 import tarfile
-import argparse
 
 def find_files_with_extension(directory, extension):
-    """Находит все файлы с заданным расширением в указанном каталоге."""
-    matched_files = []
+    # Список для хранения найденных файлов
+    files_to_archive = []
+
+    # Рекурсивно обходим директорию и ищем файлы с нужным расширением
     for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(extension):
-                matched_files.append(os.path.join(root, file))
-    return matched_files
+                file_path = os.path.join(root, file)
+                files_to_archive.append(file_path)
+    
+    return files_to_archive
 
 def create_tar_archive(files, archive_name):
-    """Создает архив tar из списка файлов."""
-    with tarfile.open(archive_name, 'w') as tar:
-        for file in files:
-            tar.add(file, arcname=os.path.relpath(file, start=os.path.dirname(files[0])))
+    try:
+        # Создаём tar архив
+        with tarfile.open(archive_name, "w") as tar:
+            for file in files:
+                tar.add(file, arcname=os.path.basename(file))
+        print(f"Архив '{archive_name}' успешно создан.")
+    except Exception as e:
+        print(f"Ошибка при создании архива: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Архивирует файлы с заданным расширением.")
-    parser.add_argument("directory", help="Путь к каталогу для поиска файлов.")
-    parser.add_argument("extension", help="Расширение файлов для архивации (например, .txt).")
-    parser.add_argument("archive_name", help="Имя выходного архива (например, archive.tar).")
-    
-    args = parser.parse_args()
-
-    files_to_archive = find_files_with_extension(args.directory, args.extension)
-
-    if files_to_archive:
-        create_tar_archive(files_to_archive, args.archive_name)
-        print(f"Архив '{args.archive_name}' успешно создан с {len(files_to_archive)} файлами.")
+    if len(sys.argv) != 4:
+        print("Использование: python3 archive_files.py <директория> <расширение> <имя_архива>")
     else:
-        print("Файлы с указанным расширением не найдены.")
+        directory = sys.argv[1]
+        extension = sys.argv[2]
+        archive_name = sys.argv[3]
+
+        # Находим файлы с заданным расширением
+        files_to_archive = find_files_with_extension(directory, extension)
+
+        if files_to_archive:
+            # Создаём архив с найденными файлами
+            create_tar_archive(files_to_archive, archive_name)
+        else:
+            print(f"Файлы с расширением '{extension}' не найдены.")
+Поиск файлов: Функция find_files_with_extension() рекурсивно обходит заданную директорию и находит все файлы с указанным расширением.
+Создание архива: Функция create_tar_archive() создаёт tar-архив и добавляет в него все найденные файлы.
+Аргументы:
+Первый аргумент: путь к директории, где искать файлы.
+Второй аргумент: расширение файлов, которые нужно найти (например, .txt).
+Третий аргумент: имя создаваемого архива (например, archive.tar).
+
+создаем директорию и архивируем
+
+![image](https://github.com/user-attachments/assets/92dc6ff5-e187-4d63-9bc8-ec83ae7f53e7)
 
 
 
