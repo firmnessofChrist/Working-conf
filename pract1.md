@@ -208,11 +208,119 @@ if __name__ == "__main__":
 ## Задача 9
 
 Написать программу, которая заменяет в файле последовательности из 4 пробелов на символ табуляции. Входной и выходной файлы задаются аргументами.
+Создадим скрипт на Python и создадим два тестовых файла intput.txt и output.txt
+
+
+![image](https://github.com/user-attachments/assets/c8c89016-0ed5-48e8-a9ac-0a94af041502)
+
+
+далее мы можем увидеть, что программа обработала файл
+
+
+![image](https://github.com/user-attachments/assets/62d824aa-36e1-4207-9b17-f844e4b51a9c)
+
+
+сравним исходник и полученный файлы:
+
+
+![image](https://github.com/user-attachments/assets/6f233c52-26a4-404a-9e81-b1b3768d85f0)
+
+
+![image](https://github.com/user-attachments/assets/a3a3086e-31c6-4fee-84e0-24574700c70f)
+
+
+
+программа:
+
+import sys
+
+def replace_spaces_with_tabs(input_file, output_file):
+    try:
+        # Открываем входной файл для чтения
+        with open(input_file, 'r') as infile:
+            content = infile.read()
+
+        # Заменяем 4 пробела на символ табуляции
+        content = content.replace('    ', '\t')
+
+        # Открываем выходной файл для записи
+        with open(output_file, 'w') as outfile:
+            outfile.write(content)
+
+        print(f"Замена завершена. Результат сохранен в {output_file}")
+    except FileNotFoundError:
+        print(f"Ошибка: файл {input_file} не найден.")
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Использование: python3 script.py <input_file> <output_file>")
+    else:
+        input_file = sys.argv[1]
+        output_file = sys.argv[2]
+        replace_spaces_with_tabs(input_file, output_file)
 
 ## Задача 10
 
 Написать программу, которая выводит названия всех пустых текстовых файлов в указанной директории. Директория передается в программу параметром. 
 
+скрипт на Python 
+import os
+import sys
+
+def find_empty_files(directory):
+    try:
+        # Проверяем, существует ли директория
+        if not os.path.isdir(directory):
+            print(f"Ошибка: {directory} не является директорией.")
+            return
+
+        # Проходим по всем файлам в директории
+        empty_files = []
+        for filename in os.listdir(directory):
+            filepath = os.path.join(directory, filename)
+
+            # Проверяем, что это файл и он пустой (размер 0 байт) и имеет расширение .txt
+            if os.path.isfile(filepath) and os.path.getsize(filepath) == 0 and filename.endswith('.txt'):
+                empty_files.append(filename)
+
+        # Выводим результат
+        if empty_files:
+            print("Пустые текстовые файлы:")
+            for file in empty_files:
+                print(file)
+        else:
+            print("В данной директории нет пустых текстовых файлов.")
+    
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Использование: python3 script.py <директория>")
+    else:
+        directory = sys.argv[1]
+        find_empty_files(directory)
+
+создаем директорию:
+mkdir my_directory
+и пустые файлы в ней:
+touch my_directory/file1.txt
+touch my_directory/file2.txt
+touch my_directory/file3.txt
+
+
+![image](https://github.com/user-attachments/assets/14a40948-f7d2-4b22-99af-9134de3280d3)
+
+
+после команды python3 directory.py my_directory
+
+
+![image](https://github.com/user-attachments/assets/305fba22-49ae-4ab6-80fc-350f619adf36)
+
+
+программа выводит пустые файлы
 ## Полезные ссылки
 
 Линукс в браузере: https://bellard.org/jslinux/
