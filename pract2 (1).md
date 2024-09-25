@@ -6,7 +6,54 @@
 
 ## Задача 1
 
-Вывести служебную информацию о пакете matplotlib (Python). Разобрать основные элементы содержимого файла со служебной информацией из пакета. Как получить пакет без менеджера пакетов, прямо из репозитория?
+ скрипт на python:
+
+import matplotlib
+import pkg_resources
+
+def print_package_info(package_name):
+    try:
+        # Получаем информацию о пакете
+        package = pkg_resources.get_distribution(package_name)
+
+        print(f"Имя пакета: {package.project_name}")
+        print(f"Версия: {package.version}")
+        print(f"Местоположение: {package.location}")
+        print(f"Зависимости: {package.requires()}")
+    except pkg_resources.DistributionNotFound:
+        print(f"Пакет '{package_name}' не найден.")
+
+if __name__ == "__main__":
+    package_name = "matplotlib"
+    print_package_info(package_name)
+
+    # Вывод версии напрямую из matplotlib
+    print(f"Версия matplotlib: {matplotlib.__version__}")
+
+Импорт библиотек: Мы импортируем matplotlib и pkg_resources.
+Получение информации: Используем pkg_resources.get_distribution() для получения информации о пакете.
+Вывод данных: Выводим имя пакета, его версию, местоположение и зависимости.
+Вывод версии напрямую: Мы также выводим версию matplotlib, используя matplotlib.__version__.
+
+
+![image](https://github.com/user-attachments/assets/402dc920-d1c5-444c-8090-b842d4c8d82c)
+
+
+Если вы хотите установить matplotlib без использования менеджера пакетов, вы можете скачать пакет из репозитория PyPI и установить его вручную. Вот шаги, которые можно выполнить:
+
+Перейдите на страницу PyPI для matplotlib: matplotlib на PyPI
+Скачайте пакет:
+На странице выберите нужную версию и скачайте .tar.gz или .whl файл.
+Распакуйте архив: Если вы скачали .tar.gz, распакуйте его:
+
+
+![image](https://github.com/user-attachments/assets/d91e26e1-abeb-411f-83e5-988739c25bb8)
+
+
+Перейдите в директорию: Зайдите в распакованную директорию cd matplotlib-X.Y.Z
+и Установите пакет: Выполните установку с помощью команды:python3 setup.py install
+
+
 
 ## Задача 2
 
