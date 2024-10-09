@@ -258,14 +258,13 @@ solve minimize sum_first;
 ## Задача 6
 
 Решить на MiniZinc задачу о зависимостях пакетов для следующих данных:
-
-% Определение всех пакетов и их зависимостей
-enum PACKAGES = {root, foo1_0, foo1_1, left, right, shared1_0, shared2_0, target1_0, target2_0};
+% Определение всех пакетов и их версий
+enum PACKAGES = {root, foo1_0, foo1_1, left_1_0, right_1_0, shared1_0, shared2_0, target1_0, target2_0};
 
 % Зависимости пакетов
 array[PACKAGES] of set of PACKAGES: dependencies = [
     {foo1_0, target2_0}, % root 1.0.0
-    {left, right},       % foo 1.1.0
+    {left_1_0, right_1_0}, % foo 1.1.0
     {},                  % foo 1.0.0
     {shared1_0},        % left 1.0.0
     {},                  % right 1.0.0
@@ -286,20 +285,20 @@ constraint forall(p in PACKAGES) (
 % Устанавливаем корневой пакет
 constraint installed[root] = true;
 
-% Ограничения на версии пакетов
-constraint installed[left] = true; % Установим left
-constraint installed[right] = false; % Не устанавливаем right
+% Устанавливаем left и right
+constraint installed[left_1_0] = true; % Установим left
+constraint installed[right_1_0] = false; % Не устанавливаем right
 
 % Найдем решение, минимизируя количество установленных пакетов
 solve minimize sum(installed);
 
-% Выводим решение
+% Выводим решение с версиями
 output [
     "Установленные пакеты: ", 
     show([p | p in PACKAGES where installed[p]]), 
     "\n",
-    "Left установлен: ", show(installed[left]), "\n",
-    "Right установлен: ", show(installed[right]), "\n"
+    "Left установлен: ", show(installed[left_1_0]), "\n",
+    "Right установлен: ", show(installed[right_1_0]), "\n"
 ];
 
 
@@ -311,7 +310,8 @@ output [
 Поиск решения: Мы решаем задачу, минимизируя количество установленных пакетов.
 
 
-![image](https://github.com/user-attachments/assets/4083b13a-7d7b-4305-bd36-ea55a5140435)
+![image](https://github.com/user-attachments/assets/6dd3851f-1965-4aaf-9439-d2f5890b7e64)
+
 
 
 
