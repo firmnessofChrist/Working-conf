@@ -162,6 +162,38 @@ if __name__ == '__main__':
     print(dependency_graph.source)
     dependency_graph.render('dependencies_graph')
 
+    import graphviz
+
+# Создаем граф для express
+dot = graphviz.Digraph(comment='Express Dependencies', format='png')
+
+# Основной узел
+dot.node('A', 'express')
+
+# Зависимости express
+dependencies = [
+    'body-parser',
+    'cookie-parser',
+    'express-session',
+    'multer',
+    'morgan',
+    'serve-favicon',
+    'compression',
+]
+
+# Добавляем узлы для зависимостей
+for dep in dependencies:
+    dot.node(dep, dep)
+
+# Добавляем связи
+for dep in dependencies:
+    dot.edge('A', dep)
+
+# Отображаем граф
+dot.render('express_dependencies_graph', cleanup=True)
+dot.view()
+
+
    после запуска скрипта появляется  png - шник
 
 
