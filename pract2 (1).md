@@ -164,7 +164,12 @@ if __name__ == '__main__':
 
    после запуска скрипта появляется  png - шник
 
-    ![image](https://github.com/user-attachments/assets/d1d54ed9-4b33-4da0-b713-b5c0b6fe4a45)
+
+
+
+![image](https://github.com/user-attachments/assets/d1d54ed9-4b33-4da0-b713-b5c0b6fe4a45)
+
+
 
 ## Задача 4
 
