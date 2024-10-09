@@ -170,6 +170,11 @@ if __name__ == '__main__':
 ![image](https://github.com/user-attachments/assets/d1d54ed9-4b33-4da0-b713-b5c0b6fe4a45)
 
 
+![image](https://github.com/user-attachments/assets/6e18a565-e787-482c-815c-284a38701dd9)
+
+
+
+
 
 ## Задача 4
 
@@ -189,45 +194,25 @@ if __name__ == '__main__':
 
 код скрипта:
 
-% Модель для задачи о счастливых билетах с минимальной суммой
-include "globals.mzn";
+include "globals.mzn"; 
+ 
+array[1..6] of var 0..9: digits; 
+constraint all_different(digits); 
+ 
+var int: sum_first = sum(digits[1..3]); 
+var int: sum_last = sum(digits[4..6]); 
+ 
+constraint sum_first = sum_last; 
+solve minimize sum_first;
 
-% Определяем переменные для каждой цифры в билете
-array[1..6] of var 0..9: ticket;
-
-% Ограничение на уникальность цифр
-constraint all_different(ticket);
-
-% Определяем суммы
-var int: sum1 = ticket[1] + ticket[2] + ticket[3];
-var int: sum2 = ticket[4] + ticket[5] + ticket[6];
-
-% Ограничение на равенство сумм
-constraint sum1 == sum2;
-
-% Минимальная сумма для первых трех цифр
-var int: min_sum = min(sum1);
-
-% Задаем цель: минимизировать sum1
-solve minimize sum1;
-
-% Выводим решение
-output [
-show(ticket), "\nСумма: ", show(sum1)
-];
-
-
-Переменные: Мы определяем массив ticket из 6 переменных, каждая из которых может принимать значение от 0 до 9.
-Ограничение all_different: Убедитесь, что все цифры в массиве ticket различны.
-Суммы: Мы определяем две переменные sum1 и sum2, которые представляют суммы первых трех и последних трех цифр соответственно.
-Условие: Мы накладываем ограничение, что сумма первых трех цифр должна быть равна сумме последних трех.
-Решение: Мы используем solve satisfy для поиска решений, удовлетворяющих всем ограничениям.
-Вывод: В конце мы выводим значение массива ticket.
 
 
 после запуска модели мы видим ответ на задачу " Найти минимальное решение для суммы 3 цифр."
 
-![image](https://github.com/user-attachments/assets/911243b1-86a9-4971-b391-dfb114ab65e3)
+
+
+![image](https://github.com/user-attachments/assets/b984b36e-9980-4379-b65b-93a223e51047)
+
 
 
 
@@ -242,53 +227,49 @@ show(ticket), "\nСумма: ", show(sum1)
 
 Решить на MiniZinc задачу о зависимостях пакетов для следующих данных:
 
-```
-root 1.0.0 зависит от foo ^1.0.0 и target ^2.0.0.
-foo 1.1.0 зависит от left ^1.0.0 и right ^1.0.0.
-foo 1.0.0 не имеет зависимостей.
-left 1.0.0 зависит от shared >=1.0.0.
-right 1.0.0 зависит от shared <2.0.0.
-shared 2.0.0 не имеет зависимостей.
-shared 1.0.0 зависит от target ^1.0.0.
-target 2.0.0 и 1.0.0 не имеют зависимостей.
-```
-
-написанный скрипт для решения задачи:
-
 % Определение всех пакетов и их зависимостей
 enum PACKAGES = {root, foo1_0, foo1_1, left, right, shared1_0, shared2_0, target1_0, target2_0};
 
 % Зависимости пакетов
-array[PACKAGES] of set of PACKAGES: dependencies = 
-    [  {foo1_0, target2_0},   % root 1.0.0
-       {left, right},        % foo 1.1.0
-       {},                   % foo 1.0.0
-       {shared1_0},         % left 1.0.0
-       {shared1_0},         % right 1.0.0
-       {},                   % shared 2.0.0
-       {target1_0},         % shared 1.0.0
-       {},                   % target 2.0.0
-       {}];                 % target 1.0.0
+array[PACKAGES] of set of PACKAGES: dependencies = [
+    {foo1_0, target2_0}, % root 1.0.0
+    {left, right},       % foo 1.1.0
+    {},                  % foo 1.0.0
+    {shared1_0},        % left 1.0.0
+    {},                  % right 1.0.0
+    {target1_0},        % shared 2.0.0
+    {},                  % shared 1.0.0
+    {},                  % target 2.0.0
+    {}                   % target 1.0.0
+];
 
 % Массив для хранения установленных пакетов
 array[PACKAGES] of var bool: installed;
 
 % Ограничения на зависимости
-constraint
-    forall(p in PACKAGES) (
-        installed[p] -> forall(dep in dependencies[p]) (installed[dep])
-    );
+constraint forall(p in PACKAGES) (
+    installed[p] -> forall(dep in dependencies[p]) (installed[dep])
+);
 
 % Устанавливаем корневой пакет
 constraint installed[root] = true;
+
+% Ограничения на версии пакетов
+constraint installed[left] = true; % Установим left
+constraint installed[right] = false; % Не устанавливаем right
 
 % Найдем решение, минимизируя количество установленных пакетов
 solve minimize sum(installed);
 
 % Выводим решение
 output [
-    "Установленные пакеты: ", show([p | p in PACKAGES where installed[p]])
+    "Установленные пакеты: ", 
+    show([p | p in PACKAGES where installed[p]]), 
+    "\n",
+    "Left установлен: ", show(installed[left]), "\n",
+    "Right установлен: ", show(installed[right]), "\n"
 ];
+
 
 Определение пакетов: Мы определяем перечисление PACKAGES, в котором перечислены все пакеты.
 Зависимости: Мы создаем массив dependencies, где для каждого пакета указаны его зависимости.
@@ -298,7 +279,8 @@ output [
 Поиск решения: Мы решаем задачу, минимизируя количество установленных пакетов.
 
 
-![image](https://github.com/user-attachments/assets/b44859c5-d4cd-4898-b6ca-64e490862dc1)
+![image](https://github.com/user-attachments/assets/4083b13a-7d7b-4305-bd36-ea55a5140435)
+
 
 
 
